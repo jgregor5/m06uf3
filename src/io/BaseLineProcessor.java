@@ -14,7 +14,7 @@ import org.xml.sax.SAXException;
  *
  * @author julian
  */
-public class BaseLineProcessor {
+public abstract class BaseLineProcessor {
 
     public static void readStream(InputStream is, boolean ignoreFirstLine,
             RowParser parser, RowProcessor... processors) {
