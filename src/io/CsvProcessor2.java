@@ -2,6 +2,7 @@ package io;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -37,9 +38,18 @@ public class CsvProcessor2 extends BaseLineProcessor {
     private static class CiudadansRowParser implements RowParser {
 
         @Override
-        public Map<String, Object> parse(String row) {
+        public Map<String, Object> parse(String line) {
 
-            return null;
+            String[] camps = line.split(",");
+            
+            Map<String, Object> map = new LinkedHashMap<>();
+            map.put("nom", camps[0]);
+            map.put("edat", Integer.parseInt(camps[1]));
+            map.put("sou", Double.parseDouble(camps[2]));
+            map.put("ciutat", camps[3]);
+            map.put("estudis", Integer.parseInt(camps[4]));
+
+            return map;
         }
 
     }
@@ -48,17 +58,26 @@ public class CsvProcessor2 extends BaseLineProcessor {
     
     private static class MinMaxEdatProcessor implements RowProcessor {
 
+        private int max = Integer.MIN_VALUE, min = Integer.MAX_VALUE;
+        
         @Override
         public void process(Map<String, Object> row) {
             
+            int edat = (int) row.get("edat");
+            if (edat > max) {
+                max = edat;
+            }
+            if (edat < min) {
+                min = edat;
+            }
         }
         
         public int getMin() {
-            return 0;
+            return min;
         }
         
         public int getMax() {
-            return 0;
+            return max;
         }
     }
 }
