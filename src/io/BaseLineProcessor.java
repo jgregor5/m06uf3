@@ -5,6 +5,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Map;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+import org.xml.sax.SAXException;
 
 /**
  *
@@ -40,6 +44,24 @@ public class BaseLineProcessor {
         }
     }
     
+    public static void readXml(InputStream is, String tag, String[] subtags, 
+            FieldParser parser, RowProcessor... processors) {
+        
+        SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
+        try {
+            SAXParser saxParser = saxParserFactory.newSAXParser();
+            
+            XmlRowHandler handler = new XmlRowHandler("ciutada", new String[]{
+                "nom", "edat", "sou", "ciutat", "estudis"
+            }, parser, processors);
+            
+            saxParser.parse(is, handler);
+            
+        } catch (ParserConfigurationException | SAXException | IOException e) {
+            throw new RuntimeException("reading xml", e);
+        }
+    }
+    
     // INTERFACES
 
     public interface RowParser {
@@ -50,5 +72,10 @@ public class BaseLineProcessor {
     public interface RowProcessor {
 
         void process(Map<String, Object> row);
+    }
+    
+    public interface FieldParser {
+        
+        Object parse(String key, String value);
     }
 }
