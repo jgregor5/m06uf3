@@ -62,6 +62,37 @@ public abstract class BaseLineProcessor {
         }
     }
     
+    public static void iterateStream(InputStream is, 
+            RowIterableParser parser, RowProcessor... processors) {
+        
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
+            
+            String line;
+            StringBuilder sb = new StringBuilder();
+            
+            while ((line = br.readLine()) != null) {
+                if (sb.length() > 0)
+                    sb.append("\n");
+                sb.append(line);
+            }
+            
+            int count = 0;
+            for (Map<String, Object> map: parser.parse(sb.toString())) {
+                
+                for (RowProcessor processor : processors) {
+                    processor.process(map);
+                }
+                
+                count ++;
+            }
+                                    
+            System.out.println("items read: " + count);
+            
+        } catch (IOException ex) {
+            throw new RuntimeException("iterating stream: " + is, ex);
+        }
+    }
+    
     // INTERFACES
 
     public interface RowParser {
@@ -77,5 +108,10 @@ public abstract class BaseLineProcessor {
     public interface FieldParser {
         
         Object parse(String key, String value);
+    }
+    
+    public interface RowIterableParser {
+
+        Iterable<Map<String, Object>> parse(String content);
     }
 }
